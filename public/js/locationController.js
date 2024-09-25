@@ -12,13 +12,13 @@ class LocationController {
     locate() {
         if (this.navigatorSupported) {
             navigator.geolocation.getCurrentPosition(
-                (position) => {
+                async (position) => {
                     const lat = position.coords.latitude;
                     const long = position.coords.longitude;
                     console.log(`Latitude: ${lat}, Longtitude: ${long}`);
                     const query = `${lat},${long}`;
 
-                    this.weatherDisplayer.updateLocation(query);
+                    await this.weatherDisplayer.updateLocation(query);
                 },
                 (error) => {
                     console.error("Error: ", error);

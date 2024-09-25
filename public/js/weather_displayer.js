@@ -22,6 +22,8 @@ class WeatherDisplayer {
     async updateLocation(newLocation) {
         this.locationQuery = newLocation;
         this.forecastContainer.replaceChildren();
+        this.start = 1;
+        this.offset = 4;
         await this.fetchWeatherData();
         this.btnLoadMore.disabled = false;
     }
