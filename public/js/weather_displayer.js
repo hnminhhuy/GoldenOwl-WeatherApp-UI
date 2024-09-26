@@ -5,7 +5,8 @@ class WeatherDisplayer {
         forecastContainer, 
         currentContainer, 
         template, 
-        btnLoadMore)
+        btnLoadMore,
+        storage)
     {
         this.start = 1;
         this.offset = 4;
@@ -15,6 +16,7 @@ class WeatherDisplayer {
         this.currentContainer = currentContainer;
         this.template = template;
         this.btnLoadMore = btnLoadMore;
+        this.storage = storage;
 
         this.btnLoadMore.onclick = () => { this.loadMore(); }
     }
@@ -74,9 +76,14 @@ class WeatherDisplayer {
         }
         
         const data = await res.json();
-       
+        
         if (this.start == 1) {
             this.bindingData(this.currentContainer, data.forecasts[0], true, data.location.name);
+            const savedData =  data.forecasts[0];
+            savedData.location = data.location.name;
+            savedData.id = this.locationQuery;
+            console.log(savedData);
+            this.storage.saveWeather(savedData);
         }
 
         for(let i = this.start; i < data.forecasts.length; i++) {
