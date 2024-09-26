@@ -63,12 +63,11 @@ class SubscriptionController {
         const {valid, email} = this.validate(this.email, this.feedback);
         const location = this.weatherDisplayer.locationQuery;
         if (valid) {
-            const data = {
-                email: email,
-                location: location,
-            }
-            console.log(data)
             try {
+                const sendData = {
+                    email: email,
+                    location: location,
+                }   
                 const res = await fetch(
                     `${this.baseUrl}/subscribe`,
                     {
@@ -76,7 +75,7 @@ class SubscriptionController {
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify(data) 
+                        body: JSON.stringify(sendData) 
                     }
                 );
                 const data = await res.json();
