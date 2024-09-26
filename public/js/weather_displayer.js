@@ -26,6 +26,11 @@ class WeatherDisplayer {
         this.offset = 4;
         await this.fetchWeatherData();
         this.btnLoadMore.disabled = false;
+        if (newLocation) {
+            document.querySelector("#trigger-subscribe").disabled = false;
+        } else {
+            document.querySelector("#trigger-subscribe").disabled = true;
+        }
     }
 
     bindingData(container, data, bindLocation = false, location = '') {
@@ -40,6 +45,15 @@ class WeatherDisplayer {
         }
     }
 
+    toggleLoading(button, state = true) {
+        button.disabled = state;
+        if (state) {
+            button.querySelector('.spinner-border').style = "";
+        } else {
+            button.querySelector('.spinner-border').style.display = 'none';
+        }
+    } 
+
     genWeatherCard(data) {
         const clone = this.template.content.cloneNode(true);
         this.bindingData(clone, data);
@@ -47,32 +61,33 @@ class WeatherDisplayer {
     }
     
     
-    fetchWeatherData() {
+    async fetchWeatherData() {
         console.log("Fetching data");
-        fetch(`${this.baseUrl}/weather/forecast?city=id:${this.locationQuery}&days=${this.offset}`)
-        .then(res => {
-            if (!res.ok) {
-                throw new Error('Network response was not OK');
-            }
-            
-            return res.json();
-        }).then(data => {
-            if (this.start == 1) {
-                this.bindingData(this.currentContainer, data.forecasts[0], true, data.location.name);
-            }
+        const res = await fetch(`${this.baseUrl}/weather/forecast?city=id:${this.locationQuery}&days=${this.offset}`)
+        if (!res.ok) {
+            throw new Error('Network response was not OK');
+        }
+        
+        const data = await res.json();
+       
+        if (this.start == 1) {
+            this.bindingData(this.currentContainer, data.forecasts[0], true, data.location.name);
+        }
 
-            for(let i = this.start; i < data.forecasts.length; i++) {
-                const content = this.genWeatherCard(data.forecasts[i]);
-                this.forecastContainer.appendChild(content);
-            }    
-            this.start = this.offset;
-            this.offset += 3;
-        })
+        for(let i = this.start; i < data.forecasts.length; i++) {
+            const content = this.genWeatherCard(data.forecasts[i]);
+            this.forecastContainer.appendChild(content);
+        }    
+        this.start = this.offset;
+        this.offset += 3;
+
     }
 
-    loadMore() {
+    async loadMore() {
+        this.toggleLoading(this.btnLoadMore, true);
+        await this.fetchWeatherData();
+        this.toggleLoading(this.btnLoadMore, false);
         if (this.offset > 14) this.btnLoadMore.disabled = true;
-        this.fetchWeatherData();
     }
 }
 

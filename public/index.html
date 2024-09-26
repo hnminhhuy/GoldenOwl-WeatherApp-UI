@@ -17,6 +17,10 @@
             crossorigin="anonymous"
         />
         <link rel="stylesheet" href="/css/style.css">
+
+        <script>
+            window.BASE_URL = '__BASE_URL__';
+        </script>
         
     </head>
 
@@ -28,20 +32,20 @@
             <div class="container-xl">
                 <div class="row">
                     <section id="control" class="col-5 col-lg-5 p-2">
-                        <div class="container">
+                        <div class="container" id="searchComponent">
                             <div class="row mb-3">
                                 <div class="col">
-                                    <div class="form-floating mb-3">
-                                        <input
-                                            type="text"
-                                            class="form-control"
-                                            name="search"
-                                            id="search"
-                                            placeholder="Eg. Ho Chi Minh, Ha Noi, ..."
-                                        />
-                                        <label for="search">Search for a city</label>
-                                    </div>
-                                    <button class="btn btn-primary w-100">Search</button>
+                                    
+                                    <div class="mb-3">
+                                        <label for="searchLocation" class="form-label"><strong>Enter a city</strong></label>
+                                        <input class="form-control" list="locationList" id="searchLocation" placeholder="Type to search...">
+                                        <datalist id="locationList"></datalist>
+                                    </div>                                                                      
+                                    <div id="search-feedback" class="mb-3" style="display: none;"></div>
+                                    <button id="btn-search" class="btn btn-primary w-100">
+                                        <span class="spinner-border spinner-border-sm" style="display: none;" aria-hidden="true"></span>
+                                        <span role="status">Get Forecast</span>                
+                                    </button>
                                 </div>
                             </div>
                             <div class="row align-items-center px-4 mb-3">
@@ -50,15 +54,87 @@
                                 <div class="divider col-5"></div>
                             </div>
                             
-                            <div class="row">
+                            <div class="row mb-3">
                                 <div class="col">
-                                    <button id="btn-locator" class="btn btn-outline-primary w-100 h-100">Use current location</button>
-                                </div>
-                                <!-- <div class="col"><button class="btn btn-outline-primary w-100 h-100">Subscribe Daily forecast</button></div> -->
-                                <!--  Modal trigger button  -->
-                                <div class="col">
+                                    <button id="btn-locator" class="btn btn-outline-primary w-100 h-100">
+                                        <span class="spinner-border spinner-border-sm" style="display: none;" aria-hidden="true"></span>
+                                        <span role="status">Use current location</span>                                        
+                                    </button>
+                                </div>   
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col" id="unsubscriptionComponent">
+                                    <!--  Modal trigger button  -->
                                     <button
                                         type="button"
+                                        class="btn btn-outline-danger w-100"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#unsubscribeModal"
+                                    >
+                                        Unsubscribe Daily Forecast
+                                    </button>
+                                    
+                                    <!-- Modal Body-->
+                                    <div
+                                        class="modal fade"
+                                        id="unsubscribeModal"
+                                        tabindex="-1"
+                                        role="dialog"
+                                        aria-labelledby="unsubscribeForm"
+                                        aria-hidden="true"
+                                    >
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="unsubscribeForm">
+                                                        Unsubscribe daily forecast
+                                                    </h5>
+                                                    <button
+                                                        type="button"
+                                                        class="btn-close"
+                                                        data-bs-dismiss="modal"
+                                                        aria-label="Close"
+                                                    ></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="container-fluid">
+                                                        <div class="form-floating mb-3">
+                                                            <input
+                                                                type="email"
+                                                                class="form-control"
+                                                                name="subscribe-email"
+                                                                id="unsubscribe-email"
+                                                                placeholder=""
+                                                            />
+                                                            <label for="unsubscribe-email">Enter your subscribed email</label>
+                                                        </div>
+                                                        <div class="mb-3" id="unsubscribe-feedback"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button
+                                                        type="button"
+                                                        class="btn btn-secondary"
+                                                        data-bs-dismiss="modal"
+                                                    >
+                                                        Close
+                                                    </button>
+                                                    <button type="button" id="btnUnsubscribe" class="btn btn-primary">
+                                                        <span class="spinner-border spinner-border-sm" style="display: none;" aria-hidden="true"></span>
+                                                        <span role="status">Save</span>  
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+
+                                <div class="col" id="subscriptionComponent">
+                                    <button
+                                        type="button"
+                                        id="trigger-subscribe"
                                         class="btn btn-outline-primary w-100 h-100"
                                         data-bs-toggle="modal"
                                         data-bs-target="#subscribe-modal"
@@ -89,6 +165,11 @@
                                                 </div>
                                                 <div class="modal-body">
                                                     <div class="container-fluid">
+                                                        <div class="card mb-3">
+                                                            <div class="card-body">
+                                                                We use the select city for this subscription!
+                                                            </div>
+                                                        </div>
                                                         <div class="form-floating mb-3">
                                                             <input
                                                                 type="email"
@@ -99,6 +180,7 @@
                                                             />
                                                             <label for="subscribe-email">Enter your email</label>
                                                         </div>
+                                                        <div class="mb-3" id="subscribe-feedback"></div>
                                                         
                                                     </div>
                                                 </div>
@@ -110,14 +192,16 @@
                                                     >
                                                         Close
                                                     </button>
-                                                    <button type="button" class="btn btn-primary">Save</button>
+                                                    <button type="button" id="btnSubscribe" class="btn btn-primary">
+                                                        <span class="spinner-border spinner-border-sm" style="display: none;" aria-hidden="true"></span>
+                                                        <span role="status">Save</span>  
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>  
-                                </div>            
+                                </div>    
                             </div>
-                            
                         </div>
                     </section>
                     <section id="control" class="col-7 col-lg-7 p-2">
@@ -127,11 +211,8 @@
                                     <div class="card-body">
                                         <div class="row">
                                             <div class="col-8">
-                                                <div class="d-flex">
-                                                    <div class="h5 pe-1 weather-card-location">Location</div>
-                                                    <div class="h5"> - </div>
-                                                    <div class="h5 weather-card-date">Date</div>
-                                                </div>
+                                                <div class="h5 pe-1 weather-card-location">Location</div>
+                                                <div class="h5 weather-card-date">Date</div>
                                                 <div class="d-flex">
                                                     <div class="pe-1 fw-bold">Temperature:</div>
                                                     <div class="pe-1 weather-card-temp">Data</div>
@@ -145,7 +226,7 @@
                                                     <div class="pe-1 weather-card-hum">Data</div>
                                                 </div>
                                             </div>
-                                            <div class="col-4 text-center">
+                                            <div class="col-4 text-center align-items-center">
                                                 <img class="weather-card-icon" src="https://cdn.weatherapi.com/weather/64x64/day/389.png"/>
                                                 <div class="fw-bold weather-card-condition">Thunder storm</div>
                                             </div>
@@ -156,7 +237,10 @@
                             <div class="row mb-3 align-items-bottom">
                                 <div class="col text-start h4 fw-bold">Forecasts</div>
                                 <div class="col text-end">
-                                    <button id="load-more" class="btn btn-secondary">Loard more</button>
+                                    <button id="load-more" class="btn btn-secondary">
+                                        <span class="spinner-border spinner-border-sm" style="display: none;" aria-hidden="true"></span>
+                                        <span role="status">Load more</span>  
+                                    </button>
                                 </div>
                             </div>
                             <template id="weather-card">
@@ -186,6 +270,13 @@
                         </div>
                     </section>
                 </div>
+            </div>
+            <div class="toast" id="subscribeToast" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; bottom: 20px; right: 20px;">
+                <div class="toast-header">
+                    <strong class="me-auto">Notification</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body"></div>
             </div>
         </main>
         <footer>
