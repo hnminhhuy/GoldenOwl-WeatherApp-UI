@@ -8,7 +8,7 @@ let baseUrl;
 document.addEventListener("DOMContentLoaded", async () => {
 
 
-    const response = await fetch('/config');
+    const response = await fetch('/api/config');
     const config = await response.json();
     baseUrl = config.HOST;
 

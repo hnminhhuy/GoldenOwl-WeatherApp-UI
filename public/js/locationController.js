@@ -87,8 +87,13 @@ class LocationController {
     }
 
     searchLocation(query) {
-        fetch(`${this.baseUrl}/weather/search?city=${query}`)
-            .then(res => {
+        fetch(`${this.baseUrl}/weather/search?city=${query}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+        }).then(res => {
                 if (!res.ok) {
                     throw new Error('Search location unsuccessfully');
                 }

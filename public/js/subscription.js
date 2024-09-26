@@ -75,7 +75,8 @@ class SubscriptionController {
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify(sendData) 
+                        credentials: "include",
+                        body: JSON.stringify(sendData),
                     }
                 );
                 const data = await res.json();
@@ -100,7 +101,13 @@ class SubscriptionController {
         if (valid) {
 
             try {
-                const res = await fetch(`${this.baseUrl}/subscribe/requestUnsubscribe?email=${email}`)
+                const res = await fetch(`${this.baseUrl}/subscribe/requestUnsubscribe?email=${email}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: "include",
+                })
                 const data = await res.json();
                 if (data.status == 400) {
                     this.updateValidation(this.unsubscribeEmail, this.unsubscribeFeedback, data.message, false);

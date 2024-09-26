@@ -62,8 +62,13 @@ class WeatherDisplayer {
     
     
     async fetchWeatherData() {
-        console.log("Fetching data");
-        const res = await fetch(`${this.baseUrl}/weather/forecast?city=id:${this.locationQuery}&days=${this.offset}`)
+        const res = await fetch(`${this.baseUrl}/weather/forecast?city=id:${this.locationQuery}&days=${this.offset}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: "include",
+        })
         if (!res.ok) {
             throw new Error('Network response was not OK');
         }
